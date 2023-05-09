@@ -1,0 +1,31 @@
+Module: redis_user_management
+
+This module provides user management functionality using Redis as the backend database. 
+
+Functions:
+- erstelle_profil(): Erstellt ein neues Benutzerprofil und speichert es in Redis.
+- hole_profil(): Ruft ein vorhandenes Benutzerprofil aus Redis ab.
+- add_login_zeit(email=None): Fügt die aktuelle Login-Zeit für ein Benutzerprofil hinzu.
+- loesche_profil(): Löscht ein vorhandenes Benutzerprofil aus Redis.
+- zeige_alle_profile(): Zeigt alle vorhandenen Benutzerprofile aus Redis an.
+- alle_loeschen(): Löscht alle Benutzerprofile aus Redis.
+- main(): Die Hauptfunktion, die eine Benutzerschnittstelle bereitstellt, um die Funktionen aufzurufen.
+
+Dependencies:
+- redis: A Python library to interact with Redis.
+
+Usage:
+
+In order to use this module, you need to have a Redis instance running on the local machine with default configurations.
+Then, simply import this module and call the `main()` function to start the user interface.
+
+Example:
+
+import redis_user_management
+
+# Start the user interface
+redis_user_management.main()
+
+Note:
+All the user inputs and stored data are case-insensitive. 
+
