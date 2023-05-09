@@ -7,9 +7,11 @@ r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 # Felder
 status = True
+expireTime = 3600  # 1 Stunde
 
 
 # Funktionen
+#
 # Funktion zur Erstellung eines Profils
 def erstelle_profil():
     email = input("E-Mail-Adresse: ")
@@ -28,10 +30,11 @@ def erstelle_profil():
     r.hset(email, "name", name)
     r.hset(email, "adresse", adresse)
 
+    # Login-Zeit hinzufügen
     add_login_zeit(email)
 
     # Expiration hinzufügen
-    r.expire(email, 3600)  # Profil wird nach 1 Stunde ablaufen
+    r.expire(email, expireTime)
 
 
 # Funktion zum Abrufen eines Profils
@@ -50,6 +53,7 @@ def hole_profil():
     for login_zeit in login_zeiten:
         print(login_zeit)
 
+# Funktion zum Hinzufügen einer Login-Zeit
 def add_login_zeit(email=None):
     if email is None:
         email = input("E-Mail-Adresse: ")
@@ -64,11 +68,12 @@ def add_login_zeit(email=None):
     r.lpush(email + ":login_zeiten", login_zeit)
 
     # Expiration erneuern
-    r.expire(email, 3600)  # Profil wird nach 1 Stunde ablaufen
+    r.expire(email, expireTime)
 
-
+# Funktion zum Löschen eines Profils
 def loesche_profil():
     email = input("E-Mail-Adresse: ")
+    email = email.lower()
     # Überprüfen, ob das Profil vorhanden ist
     if not r.exists(email):
         print("Ein Profil mit dieser E-Mail-Adresse existiert nicht")
@@ -78,29 +83,35 @@ def loesche_profil():
     r.delete(email)
     print(f"Das Profil mit der E-Mail-Adresse {email} wurde gelöscht.")
 
-
+# Funktion zum Anzeigen aller Profile
 def zeige_alle_profile():
-    # Alle Schlüssel (Profile) in Redis abrufen
+    # Alle Schlüssel der Profiele in Redis abrufen
     keys = r.keys()
 
     if not keys:
         print("Es sind keine Profile vorhanden")
         return
-
+    #Zählen wie viele Profile vorhanden sind
+    print(f"Es sind {len(keys)/2} Profile vorhanden")
+    #Alle Profile anzeigen
     print("Alle Profile:")
     for key in keys:
-        # Nur Profile anzeigen (andere Schlüssel wie z.B. Session-Keys ignorieren)
+        # Nur Profile anzeigen
         if r.type(key) == "hash":
+            print("")
             print(r.hgetall(key))
             login_zeiten = r.lrange(key + ":login_zeiten", 0, -1)
             print("Login-Zeiten:")
             for login_zeit in login_zeiten:
                 print(login_zeit)
+
+# Funktion zum Löschen aller Profile
 def alle_loeschen():
     r.flushall()
     print("Alle Profile wurden gelöscht.")
 
-# Programmablauf
+
+# Programm Loop
 while status:
     print("")
     print("Navigation")
